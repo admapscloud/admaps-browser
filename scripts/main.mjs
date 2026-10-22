@@ -6,6 +6,7 @@
 
 import { MODULE_ID } from "./site.mjs";
 import { openBrowser, openerClass } from "./browser.mjs";
+import { checkUpdate } from "./update.mjs";
 
 const ICON = `modules/${MODULE_ID}/assets/admaps.svg`;   // the site's own favicon
 
@@ -26,6 +27,16 @@ Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "format", { scope: "client", config: false, type: String, default: "webm" });
   game.settings.register(MODULE_ID, "backdropsDir", { scope: "client", config: false, type: String, default: "_Backdrops" });
   game.settings.register(MODULE_ID, "tokensDir", { scope: "client", config: false, type: String, default: "_Tokens" });
+  // The last month's releases downloaded by themselves (the gear; off by default), and what was unticked in their
+  // window — not offered again (browser.mjs _autoOffer).
+  game.settings.register(MODULE_ID, "autoDownload", { scope: "client", config: false, type: Boolean, default: false });
+  game.settings.register(MODULE_ID, "autoSkip", { scope: "client", config: false, type: Array, default: [] });
+  // «Update notice», as ADMaps Tools has (update.mjs); «Don't show again» keeps the version it was ticked for.
+  game.settings.register(MODULE_ID, "updateNotice", {
+    name: "ADMAPS_BROWSER.updateNotice.name", hint: "ADMAPS_BROWSER.updateNotice.hint",
+    scope: "client", config: true, type: Boolean, default: true,
+  });
+  game.settings.register(MODULE_ID, "updateSkip", { scope: "client", config: false, type: String, default: "" });
   // Where the GM's button is (the owner, 22.10.2026): the left toolbar by default, the Scenes list, or both.
   game.settings.register(MODULE_ID, "buttonPlace", {
     name: "ADMAPS_BROWSER.place.name",
@@ -51,6 +62,12 @@ Hooks.once("init", () => {
   });
   const mod = game.modules.get(MODULE_ID);
   if (mod) mod.api = { open: openBrowser };
+});
+
+// A newer release on GitHub — the GM is told on load (only a GM can update modules).
+Hooks.once("ready", () => {
+  if (!game.user?.isGM || !game.settings.get(MODULE_ID, "updateNotice")) return;
+  checkUpdate().catch(() => {});
 });
 
 /**

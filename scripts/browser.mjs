@@ -11,7 +11,7 @@
 import { MODULE_ID, base, loadCatalogs, fetchMe, startLogin, pollLogin, signOut } from "./site.mjs";
 import { L, plural, esc } from "./text.mjs";
 import { inCircle, promoLive, isNew, offerOf } from "./offer.mjs";
-import { setCardContext, cardOf, fitAllTags, teardown, stopWatching, tickFreeTags } from "./cards.mjs";
+import { setCardContext, cardOf, fitAllTags, teardown, stopWatching, tickFreeTags, fmtSize } from "./cards.mjs";
 import { mapPage, backdropPage } from "./pages.mjs";
 import { tokenWindow } from "./token-window.mjs";
 import { filePicker, registry, probeMap, probeBackdrop, probeToken, installMap, installBackdrop, installTokens, openScene } from "./install.mjs";
@@ -282,6 +282,7 @@ function browserClass() {
       this._paintAccount();
       if (this.page) this._openPage(this.page.kind, this.page.key);
       else this._render();
+      this._autoOffer();
     }
 
     async _refreshMe() {
@@ -838,7 +839,9 @@ function browserClass() {
         </div>
         <div class="ab-pcol">
           <h3>${esc(L("prefs.folders"))}</h3>
-          <label class="ab-dir"><span>${esc(L("prefs.maps"))}</span><code>_ADMaps</code></label>
+          <div class="ab-dir ab-maps"><span>${esc(L("prefs.maps"))}</span><code>_ADMaps</code>
+            <label class="ab-radio ab-auto"><input type="checkbox" data-pref="autoDownload"${game.settings.get(MODULE_ID, "autoDownload") ? " checked" : ""}>`
+            + `<span>${esc(L("auto.pref"))}</span></label></div>
           ${dir("backdropsDir")}
           ${dir("tokensDir")}
         </div>`;
@@ -847,7 +850,11 @@ function browserClass() {
     async _onChange(ev) {
       const t = ev.target;
       if (t.name === "ab-fmt") await game.settings.set(MODULE_ID, "format", FORMATS.includes(t.value) ? t.value : "webm");
-      else if (t.dataset?.pref) await this._setDir(t.dataset.pref, t.value);
+      else if (t.dataset?.pref === "autoDownload") {
+        await game.settings.set(MODULE_ID, "autoDownload", t.checked);
+        // Just turned on: what is waiting is offered now, not at the next opening.
+        if (t.checked) { this._autoAsked = false; this._autoOffer(); }
+      } else if (t.dataset?.pref) await this._setDir(t.dataset.pref, t.value);
     }
 
     async _setDir(key, value) {
@@ -1003,6 +1010,105 @@ function browserClass() {
       });
     }
 
+    // ── The last month's releases, downloaded by themselves (the gear; off by default) ──
+
+    /** The month's maps: out this month and all of the last one (from its 1st, by the visitor's calendar), his to
+     *  download — an exclusive only when it is his (offerOf) — newest first. */
+    _autoReleases() {
+      const me = this._me();
+      const now = new Date();
+      const day = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const from = day(new Date(now.getFullYear(), now.getMonth() - 1, 1)), to = day(now);
+      return (this.data?.maps ?? []).filter((r) => r.published >= from && r.published <= to && offerOf(r, me, base()).open.length > 0)
+        .sort((a, b) => (a.published < b.published ? 1 : a.published > b.published ? -1 : 0));
+    }
+
+    /**
+     * On entering (on signing in, and when the gear turns it on): «Releases available for automatic download» — each
+     * of the month's maps not in Data yet, ticked as far as the visitor's limits go (this month's gigabytes, this hour's
+     * links), its name a link to its page on the site (the owner, 22.10.2026). «Download» queues the ticked ones — each
+     * scene imported as by hand, nothing opened. What he unticked himself is not offered again; what the limits left
+     * unticked is, next time. Once per opening of the window; closed without «Download» — offered next time.
+     */
+    async _autoOffer() {
+      if (this._autoAsked || !this.data || !this.root) return;
+      if (!this._me().signedIn || !game.settings.get(MODULE_ID, "autoDownload")) return;
+      this._autoAsked = true;
+      const month = this._autoReleases();
+      // Waved away once — kept only while the release is still in the month's window.
+      const skip = new Set((game.settings.get(MODULE_ID, "autoSkip") ?? []).filter((id) => month.some((r) => r.release === id)));
+      const missing = [];
+      for (const r of month) {
+        if (skip.has(r.release) || this.dl.get(`map:${r.release}`)?.state === "busy") continue;
+        if (!(await probeMap(r).catch(() => null))) missing.push(r);
+      }
+      if (!missing.length || !this.root) return;
+
+      const q = this._me().quota ?? {};
+      const GB = 1024 ** 3;   // as the site counts them (/api/me quota)
+      const bytesOf = (r) => {
+        const s = r.sets ?? {}, f = this._wantFormat(r);
+        return Number(f === "webp" ? s.fi : f === "lite" ? s.fvLite : s.fv) || 0;
+      };
+      let roomBytes = Number.isFinite(q.gbLeft) ? q.gbLeft * GB : Infinity;
+      let roomLinks = Number.isFinite(q.linksLeftThisHour) ? q.linksLeftThisHour : Infinity;
+      const rows = missing.map((r) => {
+        const bytes = bytesOf(r);
+        const on = bytes <= roomBytes && roomLinks > 0;
+        if (on) { roomBytes -= bytes; roomLinks -= 1; }
+        return { r, bytes, on };
+      });
+      const list = rows.map(({ r, bytes, on }) => `<li><label class="ab-auto-row">`
+        + `<input type="checkbox" name="rel" value="${esc(r.release)}"${on ? " checked" : ""}>`
+        + `<a href="${esc(`${base()}/map/${r.release}`)}" target="_blank" rel="noopener">${esc(r.title)}</a></label>`
+        + `<span class="ab-auto-size">${esc(fmtSize(bytes))}</span></li>`).join("");
+      const num = (v) => (Number.isFinite(Number(v)) ? String(v) : "—");
+      // The ticked ones against the limits, again at every tick. Within them — not a word about limits (the owner,
+      // 22.10.2026: «don't annoy him»); over them, «Download» is off and the line right above it says why, until
+      // unticking brings it back within.
+      const paintLimits = (root) => {
+        const warn = root?.querySelector?.(".ab-auto-warn");
+        if (!warn) return;
+        const ticked = rows.filter(({ r }) => root.querySelector(`input[name="rel"][value="${CSS.escape(r.release)}"]`)?.checked);
+        const bytes = ticked.reduce((s, x) => s + x.bytes, 0);
+        const overGb = Number.isFinite(q.gbLeft) && bytes > q.gbLeft * GB;
+        const overLinks = Number.isFinite(q.linksLeftThisHour) && ticked.length > q.linksLeftThisHour;
+        warn.hidden = !(overGb || overLinks);
+        warn.textContent = overGb ? L("auto.overGb", { size: (bytes / GB).toFixed(1), left: num(q.gbLeft) })
+          : overLinks ? L("auto.overLinks", { n: num(q.linksLeftThisHour) }) : "";
+        const button = root.querySelector('button[data-action="download"]');
+        if (button) button.disabled = overGb || overLinks;
+      };
+      const picked = await foundry.applications.api.DialogV2.wait({
+        window: { title: L("auto.title"), icon: "fa-solid fa-cloud-arrow-down" },
+        classes: ["admaps-browser-auto"],
+        position: { width: 480 },
+        content: `<p>${esc(L("auto.lead"))}</p><ul class="ab-auto-list">${list}</ul><p class="ab-auto-warn" hidden></p>`,
+        buttons: [{
+          action: "download", label: L("download"), icon: "fa-solid fa-download", default: true,
+          callback: (_ev, button) => [...button.form.querySelectorAll('input[name="rel"]')].map((i) => ({ id: i.value, on: i.checked })),
+        }],
+        rejectClose: false,
+        render: (_ev, dialog) => {
+          const root = dialog?.element ?? dialog;
+          paintLimits(root);
+          root?.addEventListener?.("change", () => paintLimits(root));
+        },
+      }).catch(() => null);
+      if (!Array.isArray(picked)) return;   // closed: offered again next time
+
+      const shownOn = new Set(rows.filter((x) => x.on).map((x) => x.r.release));
+      const declined = picked.filter((x) => !x.on && shownOn.has(x.id)).map((x) => x.id);
+      if (declined.length) await game.settings.set(MODULE_ID, "autoSkip", [...skip, ...declined]);
+      const want = new Set(picked.filter((x) => x.on).map((x) => x.id));
+      const todo = rows.map(({ r }) => r).filter((r) => want.has(r.release));
+      if (!todo.length) return;
+      ui.notifications.info(L("auto.start", { n: todo.length }));
+      const done = await Promise.all(todo.map((r) => this._download(`map:${r.release}`, r.title,
+        (p) => installMap(r, { fmt: this._wantFormat(r), base: base(), onProgress: p }))));
+      ui.notifications.info(L("auto.done", { n: done.filter(Boolean).length, total: todo.length }));
+    }
+
     async _toScene(r, info) {
       try {
         await openScene(r, info);
@@ -1103,6 +1209,7 @@ function browserClass() {
         this.login = null;
         ui.notifications.info(L("login.done", { name: r.user?.name || L("account") }));
         await this._refreshMe();
+        this._autoOffer();
         return;
       }
       if (r.error) return this._loginFailed(r.error, r.message);

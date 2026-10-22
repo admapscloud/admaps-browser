@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1
+- Update notice: when a newer release is out, the GM gets a window on load with the installed and the new version and
+  how to update. «Don't show again» hides it until the next release; the module setting «Update notice» turns it off.
+- Auto-download fresh releases (under the gear, next to the maps folder; off by default). On opening the browser it
+  offers the maps released this month and the whole of the last one that you can download and do not have yet —
+  exclusives only if they are yours: a checkbox for each, its name a link to its page, its size on the right. Ticked
+  are as many as your limits allow; over them, **Download** turns off and says why until you untick enough. The ticked
+  ones download one after another, their scenes imported into the **ADMaps** folder. What you untick yourself is not
+  offered again.
+
 ## 0.1.0
 First release.
 - The admaps.cloud catalogue inside Foundry VTT v12–v14: maps, backdrops and NPC tokens in the site's own order, with

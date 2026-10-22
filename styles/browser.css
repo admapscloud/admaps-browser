@@ -137,14 +137,29 @@
 .admaps-browser .ab-root .ab-radio input { flex: none; width: 15px; height: 15px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; appearance: auto; }
 .admaps-browser .ab-root .ab-radio input::before, .admaps-browser .ab-root .ab-radio input::after { content: none; }
 .admaps-browser .ab-root .ab-radio b { color: var(--ink); font-weight: 600; }
+/* «Auto-download fresh releases» — right of the maps' folder (the owner, 22.10.2026). */
+.admaps-browser .ab-root .ab-dir.ab-maps code { grid-column: 2; }
+.admaps-browser .ab-root .ab-dir.ab-maps .ab-auto { grid-column: 3; align-items: center; padding: 0; white-space: nowrap; }
+.admaps-browser .ab-root .ab-dir.ab-maps .ab-auto input { margin: 0; }
+
+/* The window «Releases available for automatic download» — a core dialog, outside the browser's own window. */
+.admaps-browser-auto .ab-auto-list { list-style: none; margin: .4em 0 .6em; padding: 0; max-height: 18em; overflow-y: auto; }
+.admaps-browser-auto .ab-auto-list li { display: flex; align-items: center; gap: 10px; padding: 2px 0; }
+.admaps-browser-auto .ab-auto-row { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; }
+.admaps-browser-auto .ab-auto-row input { flex: none; margin: 0; }
+.admaps-browser-auto .ab-auto-row a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admaps-browser-auto .ab-auto-size { flex: none; opacity: .7; font-size: .9em; font-variant-numeric: tabular-nums; }
+/* Over the limits — right above the «Download» it turned off; within them nothing is said. */
+.admaps-browser-auto .ab-auto-warn { margin: .5em 0 0; color: var(--color-level-warning, #ee9b3a); font-size: .92em; }
+.admaps-browser-auto .ab-auto-warn[hidden] { display: none; }
 .admaps-browser .ab-root .ab-dir { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: var(--dim); }
 .admaps-browser .ab-root .ab-dir code { grid-column: 2 / -1; font: 13px ui-monospace, "Cascadia Mono", Consolas, monospace; color: #c3cad5; padding: 6px 0; background: none; border-radius: 0; }
-.admaps-browser .ab-root .ab-dir input {
+.admaps-browser .ab-root .ab-dir input[type="text"] {
   min-width: 0; width: 100%; height: auto; margin: 0; padding: 6px 9px; border-radius: 7px; box-shadow: none;
   border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink);
   font: 13px ui-monospace, "Cascadia Mono", Consolas, monospace; line-height: normal; outline: none;
 }
-.admaps-browser .ab-root .ab-dir input:focus { border-color: #3d4756; background: #1b2028; box-shadow: none; }
+.admaps-browser .ab-root .ab-dir input[type="text"]:focus { border-color: #3d4756; background: #1b2028; box-shadow: none; }
 .admaps-browser .ab-root .ab-pick {
   all: unset; box-sizing: border-box; cursor: pointer; width: 31px; height: 31px;
   display: inline-flex; align-items: center; justify-content: center;
