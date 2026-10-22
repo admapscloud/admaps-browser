@@ -62,9 +62,12 @@ export function tierNeeded(shop, r, exists) {
     .sort((a, b) => a.rank - b.rank)[0] ?? null;
 }
 
+/** A web address from the site's data, or the fallback: what goes into an href is http(s) and nothing else. */
+const webUrl = (u, fallback) => (/^https?:\/\//i.test(String(u ?? "")) ? u : fallback);
+
 /** Straight to that tier's checkout, coming back to the map's page on the site. */
 export function tierUrl(tier, r, fallback, base) {
-  if (!tier?.checkout) return fallback;
+  if (!webUrl(tier?.checkout)) return fallback;
   const back = r?.release ? `${base}/map/${r.release}` : `${base}/`;
   return `${tier.checkout}&redirect_uri=${encodeURIComponent(back)}`;
 }
@@ -74,7 +77,7 @@ export function upgradeUrl(shop, r, variant, fallback, base) {
   const tier = (shop?.tiers ?? [])
     .filter((t) => t[variant] && t.rank >= need)
     .sort((a, b) => a.rank - b.rank)[0];
-  if (!tier) return fallback;
+  if (!webUrl(tier?.checkout)) return fallback;
   const back = r?.release ? `${base}/map/${r.release}` : `${base}/`;
   return `${tier.checkout}&redirect_uri=${encodeURIComponent(back)}`;
 }
@@ -165,6 +168,6 @@ export function offerOf(r, me, base) {
     // FREE for any follower, but this visitor cannot take it yet: following for free is the one step left.
     followFree: badgeNow && !freeNow && !!r.free?.who?.includes("free"),
     families, exists, open,
-    buyUrl: r.shopUrl || SHOP_PAGES[r.campaign || primary] || SHOP_PAGES.adm,
+    buyUrl: webUrl(r.shopUrl, SHOP_PAGES[r.campaign || primary] || SHOP_PAGES.adm),
   };
 }

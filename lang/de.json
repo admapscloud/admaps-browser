@@ -146,7 +146,7 @@
   "ADMAPS_BROWSER.prefs.limits": "Limits",
   "ADMAPS_BROWSER.prefs.month": "Diesen Monat übrig: {left} GB von {total} GB",
   "ADMAPS_BROWSER.prefs.links": "Download-Links in dieser Stunde: {n}",
-  "ADMAPS_BROWSER.prefs.active": "Laufende Downloads: {n} von {max}",
+  "ADMAPS_BROWSER.prefs.openAfter": "Szene nach dem Download öffnen",
   "ADMAPS_BROWSER.prefs.format": "Kartenformat",
   "ADMAPS_BROWSER.prefs.folders": "Ordner",
   "ADMAPS_BROWSER.prefs.maps": "Karten",

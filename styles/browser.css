@@ -137,6 +137,9 @@
 .admaps-browser .ab-root .ab-radio input { flex: none; width: 15px; height: 15px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; appearance: auto; }
 .admaps-browser .ab-root .ab-radio input::before, .admaps-browser .ab-root .ab-radio input::after { content: none; }
 .admaps-browser .ab-root .ab-radio b { color: var(--ink); font-weight: 600; }
+/* «Open the scene after download» — under the limits. */
+.admaps-browser .ab-root .ab-radio.ab-open { margin-top: 6px; align-items: center; }
+.admaps-browser .ab-root .ab-radio.ab-open input { margin: 0; }
 /* «Auto-download fresh releases» — right of the maps' folder (the owner, 22.10.2026). */
 .admaps-browser .ab-root .ab-dir.ab-maps code { grid-column: 2; }
 .admaps-browser .ab-root .ab-dir.ab-maps .ab-auto { grid-column: 3; align-items: center; padding: 0; white-space: nowrap; }

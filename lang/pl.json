@@ -166,7 +166,7 @@
   "ADMAPS_BROWSER.prefs.limits": "Limity",
   "ADMAPS_BROWSER.prefs.month": "Zostało w tym miesiącu: {left} GB z {total} GB",
   "ADMAPS_BROWSER.prefs.links": "Linków do pobrania w tej godzinie: {n}",
-  "ADMAPS_BROWSER.prefs.active": "Pobierane teraz: {n} z {max}",
+  "ADMAPS_BROWSER.prefs.openAfter": "Otwieraj scenę po pobraniu",
   "ADMAPS_BROWSER.prefs.format": "Format map",
   "ADMAPS_BROWSER.prefs.folders": "Foldery",
   "ADMAPS_BROWSER.prefs.maps": "Mapy",

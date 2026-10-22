@@ -48,8 +48,22 @@ async function mkdirs(dir) {
   }
 }
 
+/**
+ * A path from outside (an archive's entry, a file name from the catalogue) as a plain relative path under Data, or
+ * null: no backslashes, no drive, no leading slash, no «..» or «.» segments, no empty ones, not a folder. Core's server
+ * keeps the FOLDER inside Data; the file's own name it takes as it comes — so nothing from the site names the path.
+ */
+export function safeRel(name) {
+  const s = String(name ?? "");
+  if (!s || s.includes("\\") || s.includes("\0") || /^[A-Za-z]:/.test(s) || s.startsWith("/") || s.endsWith("/")) return null;
+  const parts = s.split("/");
+  if (parts.some((p) => p === "" || p === "." || p === "..")) return null;
+  return parts.join("/");
+}
+
 /** One file into Data: path relative to Data, the bytes as Blob parts. */
 async function putFile(path, parts) {
+  if (safeRel(path) !== path) throw new Error(L("err.broken"));
   const cut = path.lastIndexOf("/");
   const dir = path.slice(0, cut);
   const name = path.slice(cut + 1);
@@ -303,8 +317,10 @@ export async function installMap(r, { fmt, base, onProgress }) {
   let dir = null;   // the release's folder as the archive has it (by its first version's file)
   const jsons = [];
   await readZip(res, async (name, data) => {
-    // The license sits at the archive's root; here — in the release's own folder, not in Data's.
-    const path = name.includes("/") ? name : `${dir ?? mapDir(r)}/${name}`;
+    // The license sits at the archive's root; here — in the release's own folder, not in Data's. Every entry stays
+    // under _ADMaps/: an archive naming anything else is not the site's.
+    const path = safeRel(name.includes("/") ? name : `${dir ?? mapDir(r)}/${name}`);
+    if (!path || !path.startsWith("_ADMaps/")) throw new Error(L("err.broken"));
     if (!dir && path.slice(path.lastIndexOf("/") + 1).startsWith(`${first}.`)) dir = path.slice(0, path.lastIndexOf("/"));
     if (/\.json$/i.test(path)) jsons.push({ path, text: await new Blob(data).text() });
     await putFile(path, data);
@@ -326,9 +342,11 @@ export async function installMap(r, { fmt, base, onProgress }) {
 /** A backdrop's file (webp or webm) into the backdrops folder. */
 export async function installBackdrop(r, kind, dir, onProgress) {
   const f = r[kind];
-  const res = await fetchFile(`/b/${r.backdrop}/${encodeURIComponent(f.file)}`);
+  const name = safeRel(f.file);
+  if (!name || name.includes("/")) throw new Error(L("err.broken"));   // a file name, nothing more
+  const res = await fetchFile(`/b/${encodeURIComponent(r.backdrop)}/${encodeURIComponent(name)}`);
   const blob = await streamed(res, f.bytes, onProgress);
-  const path = await putFile(`${dir}/${f.file}`, [blob]);
+  const path = await putFile(`${dir}/${name}`, [blob]);
   const R = await registry();
   R.backdrops[r.backdrop] = { ...(R.backdrops[r.backdrop] ?? {}), [kind]: path };
   await saveRegistry();
@@ -341,7 +359,10 @@ export async function installTokens({ key = null, group = null }, dir, onProgres
   const total = Number(res.headers.get("content-length")) || 0;
   let got = 0;
   await readZip(res, async (name, data) => {
-    await putFile(`${dir}/${name.replace(/^_Tokens\//, "")}`, data);
+    // Under the tokens folder only: the site's _Tokens/ is dropped, the rest must be a plain relative path.
+    const rel = safeRel(name.replace(/^_Tokens\//, ""));
+    if (!rel) throw new Error(L("err.broken"));
+    await putFile(`${dir}/${rel}`, data);
   }, (n) => { got += n; onProgress?.(total ? Math.min(1, got / total) : 0); });
   const R = await registry();
   if (key) R.tokens[key] = dir;

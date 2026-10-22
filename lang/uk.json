@@ -160,7 +160,7 @@
   "ADMAPS_BROWSER.prefs.limits": "Ліміти",
   "ADMAPS_BROWSER.prefs.month": "Залишилося цього місяця: {left} ГБ з {total} ГБ",
   "ADMAPS_BROWSER.prefs.links": "Посилань на завантаження цієї години: {n}",
-  "ADMAPS_BROWSER.prefs.active": "Завантажується зараз: {n} з {max}",
+  "ADMAPS_BROWSER.prefs.openAfter": "Відкривати сцену після завантаження",
   "ADMAPS_BROWSER.prefs.format": "Формат мап",
   "ADMAPS_BROWSER.prefs.folders": "Папки",
   "ADMAPS_BROWSER.prefs.maps": "Мапи",

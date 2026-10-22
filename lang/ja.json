@@ -139,7 +139,7 @@
   "ADMAPS_BROWSER.prefs.limits": "制限",
   "ADMAPS_BROWSER.prefs.month": "今月の残り：{total} GB 中 {left} GB",
   "ADMAPS_BROWSER.prefs.links": "この 1 時間に使えるダウンロードリンク：{n}",
-  "ADMAPS_BROWSER.prefs.active": "ダウンロード中：{max} 件中 {n} 件",
+  "ADMAPS_BROWSER.prefs.openAfter": "ダウンロード後にシーンを開く",
   "ADMAPS_BROWSER.prefs.format": "マップの形式",
   "ADMAPS_BROWSER.prefs.folders": "フォルダー",
   "ADMAPS_BROWSER.prefs.maps": "マップ",

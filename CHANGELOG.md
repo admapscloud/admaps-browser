@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2
+- Open the scene after download (the gear, under the limits; on by default): off, a download ends on the shelf and
+  the button reads **Open**.
+- Auto-download: whatever the window has shown counts as offered, however it was closed. It comes back only when a
+  release it has not shown yet is out — that one ticked, the earlier ones listed unticked.
+- The gear no longer shows the line about concurrent downloads.
+- Hardening: an archive's entries stay under their own folder whatever they are named; download links and files are
+  taken from the site only; the sign-in page must be a web address; what the site says is shown as text in
+  notifications.
+
 ## 0.1.1
 - Update notice: when a newer release is out, the GM gets a window on load with the installed and the new version and
   how to update. «Don't show again» hides it until the next release; the module setting «Update notice» turns it off.

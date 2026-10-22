@@ -148,7 +148,7 @@
   "ADMAPS_BROWSER.prefs.limits": "Limites",
   "ADMAPS_BROWSER.prefs.month": "Reste ce mois-ci : {left} Go sur {total} Go",
   "ADMAPS_BROWSER.prefs.links": "Liens de téléchargement restants cette heure : {n}",
-  "ADMAPS_BROWSER.prefs.active": "Téléchargements en cours : {n} sur {max}",
+  "ADMAPS_BROWSER.prefs.openAfter": "Ouvrir la scène après le téléchargement",
   "ADMAPS_BROWSER.prefs.format": "Format des cartes",
   "ADMAPS_BROWSER.prefs.folders": "Dossiers",
   "ADMAPS_BROWSER.prefs.maps": "Cartes",

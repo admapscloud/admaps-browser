@@ -27,10 +27,14 @@ Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "format", { scope: "client", config: false, type: String, default: "webm" });
   game.settings.register(MODULE_ID, "backdropsDir", { scope: "client", config: false, type: String, default: "_Backdrops" });
   game.settings.register(MODULE_ID, "tokensDir", { scope: "client", config: false, type: String, default: "_Tokens" });
-  // The last month's releases downloaded by themselves (the gear; off by default), and what was unticked in their
-  // window — not offered again (browser.mjs _autoOffer).
+  // After a map's download its scene opens and the window folds — unless this is off (the gear, under the limits).
+  game.settings.register(MODULE_ID, "openAfter", { scope: "client", config: false, type: Boolean, default: true });
+  // The last month's releases downloaded by themselves (the gear; off by default), and what their window has shown
+  // already — offered by itself no more (browser.mjs _autoOffer).
   game.settings.register(MODULE_ID, "autoDownload", { scope: "client", config: false, type: Boolean, default: false });
-  game.settings.register(MODULE_ID, "autoSkip", { scope: "client", config: false, type: Array, default: [] });
+  // {release: 1} — an object, not an array: core casts a setting's value by its type, and an object comes back as it is
+  // in every version.
+  game.settings.register(MODULE_ID, "autoSkip", { scope: "client", config: false, type: Object, default: {} });
   // «Update notice», as ADMaps Tools has (update.mjs); «Don't show again» keeps the version it was ticked for.
   game.settings.register(MODULE_ID, "updateNotice", {
     name: "ADMAPS_BROWSER.updateNotice.name", hint: "ADMAPS_BROWSER.updateNotice.hint",

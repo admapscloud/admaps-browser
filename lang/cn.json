@@ -139,7 +139,7 @@
   "ADMAPS_BROWSER.prefs.limits": "限额",
   "ADMAPS_BROWSER.prefs.month": "本月剩余：{left} GB / {total} GB",
   "ADMAPS_BROWSER.prefs.links": "本小时剩余下载链接：{n}",
-  "ADMAPS_BROWSER.prefs.active": "正在下载：{n} / {max}",
+  "ADMAPS_BROWSER.prefs.openAfter": "下载后打开场景",
   "ADMAPS_BROWSER.prefs.format": "地图格式",
   "ADMAPS_BROWSER.prefs.folders": "文件夹",
   "ADMAPS_BROWSER.prefs.maps": "地图",

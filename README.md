@@ -57,10 +57,13 @@ typed into Foundry.
 - **Backdrops** go into `_Backdrops`, **tokens** — one with its portrait, or a whole set — into `_Tokens`. Both folders
   can be changed under the gear.
 - The gear also shows your download limits: what is left this month and this hour.
+- **Open the scene after download** (under the limits, on by default): off, a download ends on the shelf — the
+  button reads **Open** and takes you to the scene whenever you want.
 - **Auto-download fresh releases** (under the gear, off by default): when you open the browser, it lists the maps
   released this month and the whole of the last one that you can download and do not have yet — exclusives only if
   they are yours. Each comes with a checkbox, a link to its page and its size; ticked are as many as your limits allow.
-  **Download** takes the ticked ones one after another. What you untick yourself is not offered again.
+  **Download** takes the ticked ones one after another. Whatever the window has shown counts as offered, however you
+  closed it: it comes back only when a release it has not shown yet is out, with the earlier ones listed unticked.
 
 ## Updates
 

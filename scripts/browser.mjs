@@ -77,8 +77,9 @@ const CHECK_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" 
 const SPIN_ICON = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>';
 const FORMATS = ["webm", "lite", "webp"];
 const DEFAULT_DIRS = { backdropsDir: "_Backdrops", tokensDir: "_Tokens" };
-/** A folder as typed: forward slashes, none at the ends; empty — the default. */
-const cleanDir = (v, key) => String(v ?? "").trim().replace(/\\/g, "/").replace(/^\/+|\/+$/g, "") || DEFAULT_DIRS[key];
+/** A folder as typed: forward slashes, none at the ends, no «..» or «.» steps; empty — the default. */
+const cleanDir = (v, key) => String(v ?? "").trim().replace(/\\/g, "/").split("/")
+  .filter((p) => p && p !== "." && p !== "..").join("/") || DEFAULT_DIRS[key];
 
 const PROJECTS = [
   ["adm", "Animated Dungeon Maps", "https://www.patreon.com/animatedmaps"],
@@ -830,7 +831,8 @@ function browserClass() {
           <div class="ab-meter"><i style="width:${(used * 100).toFixed(1)}%"></i></div>
           <p>${esc(L("prefs.month", { left: num(q.gbLeft), total: num(q.gbAllowance) }))}</p>
           <p>${esc(L("prefs.links", { n: num(q.linksLeftThisHour) }))}</p>
-          <p>${esc(L("prefs.active", { n: num(q.activeDownloads ?? 0), max: num(q.maxConcurrent) }))}</p>
+          <label class="ab-radio ab-open"><input type="checkbox" data-pref="openAfter"${game.settings.get(MODULE_ID, "openAfter") ? " checked" : ""}>`
+            + `<span>${esc(L("prefs.openAfter"))}</span></label>
         </div>
         <div class="ab-pcol">
           <h3>${esc(L("prefs.format"))}</h3>
@@ -850,6 +852,7 @@ function browserClass() {
     async _onChange(ev) {
       const t = ev.target;
       if (t.name === "ab-fmt") await game.settings.set(MODULE_ID, "format", FORMATS.includes(t.value) ? t.value : "webm");
+      else if (t.dataset?.pref === "openAfter") await game.settings.set(MODULE_ID, "openAfter", t.checked);
       else if (t.dataset?.pref === "autoDownload") {
         await game.settings.set(MODULE_ID, "autoDownload", t.checked);
         // Just turned on: what is waiting is offered now, not at the next opening.
@@ -994,7 +997,8 @@ function browserClass() {
         if (choice !== "update") return;
       }
       const res = await this._download(key, r.title, (p) => installMap(r, { fmt: want, base: base(), onProgress: p }));
-      if (res) await this._toScene(r, res);
+      // Downloaded: to its scene — unless the gear says to stay («Open» on the button takes there any time).
+      if (res && game.settings.get(MODULE_ID, "openAfter")) await this._toScene(r, res);
     }
 
     async _askUpdate(r, have, want) {
@@ -1024,25 +1028,28 @@ function browserClass() {
     }
 
     /**
-     * On entering (on signing in, and when the gear turns it on): «Releases available for automatic download» — each
-     * of the month's maps not in Data yet, ticked as far as the visitor's limits go (this month's gigabytes, this hour's
-     * links), its name a link to its page on the site (the owner, 22.10.2026). «Download» queues the ticked ones — each
-     * scene imported as by hand, nothing opened. What he unticked himself is not offered again; what the limits left
-     * unticked is, next time. Once per opening of the window; closed without «Download» — offered next time.
+     * On entering (on signing in, and when the gear turns it on): «Releases available for automatic download» — the
+     * month's maps not in Data yet, its name a link to its page on the site, its size beside (the owner, 22.10.2026).
+     * The window comes only when there is one it has not shown before: whatever it showed counts as offered, however
+     * it was closed (the owner: «I unticked it and closed the browser — why is it offered again? Only a new release on
+     * the site would make sense»). A new one comes ticked as far as the limits go (this month's gigabytes, this hour's
+     * links); the ones offered before are listed unticked, to be taken by hand. «Download» queues the ticked ones —
+     * each scene imported as by hand, nothing opened. Once per opening of the window.
      */
     async _autoOffer() {
       if (this._autoAsked || !this.data || !this.root) return;
       if (!this._me().signedIn || !game.settings.get(MODULE_ID, "autoDownload")) return;
       this._autoAsked = true;
       const month = this._autoReleases();
-      // Waved away once — kept only while the release is still in the month's window.
-      const skip = new Set((game.settings.get(MODULE_ID, "autoSkip") ?? []).filter((id) => month.some((r) => r.release === id)));
+      // Offered before — remembered while the release is still in the month's window.
+      const shown = game.settings.get(MODULE_ID, "autoSkip");
+      const seen = new Set(Object.keys(shown && typeof shown === "object" ? shown : {}).filter((id) => month.some((r) => r.release === id)));
       const missing = [];
       for (const r of month) {
-        if (skip.has(r.release) || this.dl.get(`map:${r.release}`)?.state === "busy") continue;
+        if (this.dl.get(`map:${r.release}`)?.state === "busy") continue;
         if (!(await probeMap(r).catch(() => null))) missing.push(r);
       }
-      if (!missing.length || !this.root) return;
+      if (!missing.some((r) => !seen.has(r.release)) || !this.root) return;
 
       const q = this._me().quota ?? {};
       const GB = 1024 ** 3;   // as the site counts them (/api/me quota)
@@ -1054,7 +1061,7 @@ function browserClass() {
       let roomLinks = Number.isFinite(q.linksLeftThisHour) ? q.linksLeftThisHour : Infinity;
       const rows = missing.map((r) => {
         const bytes = bytesOf(r);
-        const on = bytes <= roomBytes && roomLinks > 0;
+        const on = !seen.has(r.release) && bytes <= roomBytes && roomLinks > 0;
         if (on) { roomBytes -= bytes; roomLinks -= 1; }
         return { r, bytes, on };
       });
@@ -1095,11 +1102,9 @@ function browserClass() {
           root?.addEventListener?.("change", () => paintLimits(root));
         },
       }).catch(() => null);
-      if (!Array.isArray(picked)) return;   // closed: offered again next time
-
-      const shownOn = new Set(rows.filter((x) => x.on).map((x) => x.r.release));
-      const declined = picked.filter((x) => !x.on && shownOn.has(x.id)).map((x) => x.id);
-      if (declined.length) await game.settings.set(MODULE_ID, "autoSkip", [...skip, ...declined]);
+      // However it was closed, what it showed is offered by itself no more — until a release it has not shown comes.
+      await game.settings.set(MODULE_ID, "autoSkip", Object.fromEntries([...seen, ...rows.map((x) => x.r.release)].map((id) => [id, 1])));
+      if (!Array.isArray(picked)) return;
       const want = new Set(picked.filter((x) => x.on).map((x) => x.id));
       const todo = rows.map(({ r }) => r).filter((r) => want.has(r.release));
       if (!todo.length) return;
@@ -1114,7 +1119,7 @@ function browserClass() {
         await openScene(r, info);
         await this.minimize?.();   // the scene is what he came for
       } catch (e) {
-        ui.notifications.error(L("dl.openFailed", { title: r.title, error: e.message }));
+        ui.notifications.error(L("dl.openFailed", { title: esc(r.title), error: esc(e.message) }));
       }
     }
 
@@ -1147,7 +1152,7 @@ function browserClass() {
         back();
         this._paintKey(key);
         const error = e instanceof TypeError ? L("err.network") : e.message;
-        ui.notifications.error(L("dl.failed", { title, error }));
+        ui.notifications.error(L("dl.failed", { title: esc(title), error: esc(error) }));
         return null;
       }
     }
@@ -1169,7 +1174,7 @@ function browserClass() {
         <p>${esc(L("login.step"))}</p>
         <div class="ab-code">${esc(lg.code)}</div>
         <div class="ab-login-btns">
-          <a class="ab-btn ab-primary" href="${esc(lg.verifyUrl)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(L("login.open"))}</a>
+          ${lg.verifyUrl ? `<a class="ab-btn ab-primary" href="${esc(lg.verifyUrl)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(L("login.open"))}</a>` : ""}
           <button type="button" class="ab-btn" data-ab="cancel">${esc(L("login.cancel"))}</button>
         </div>
         <p class="ab-wait">${esc(lg.msg ?? L("login.waiting"))}</p>`;
@@ -1182,13 +1187,13 @@ function browserClass() {
       try {
         r = await startLogin();
       } catch (e) {
-        ui.notifications.error(L("login.failed", { error: e.message }));
+        ui.notifications.error(L("login.failed", { error: esc(e.message) }));
         return;
       }
       this.login = { ...r, expires: Date.now() + (r.expiresIn ?? 600) * 1000, msg: null, timer: null };
       this._paintAccount();
       // The site's page with the code filled in; blocked as a pop-up — the button in the panel opens it.
-      try { window.open(r.verifyUrl, "_blank", "noopener"); } catch (_e) { /* the link is in the panel */ }
+      if (r.verifyUrl) try { window.open(r.verifyUrl, "_blank", "noopener"); } catch (_e) { /* the link is in the panel */ }
       this._schedulePoll();
     }
 
@@ -1207,7 +1212,8 @@ function browserClass() {
       if (this.login !== lg) return;   // cancelled meanwhile
       if (r.done) {
         this.login = null;
-        ui.notifications.info(L("login.done", { name: r.user?.name || L("account") }));
+        // What the site says of a person goes into a notification as text (core renders them as HTML).
+        ui.notifications.info(L("login.done", { name: esc(r.user?.name || L("account")) }));
         await this._refreshMe();
         this._autoOffer();
         return;
@@ -1221,7 +1227,7 @@ function browserClass() {
       this.login = null;
       if (kind === "denied") ui.notifications.warn(L("login.denied"));
       else if (kind === "expired") ui.notifications.warn(L("login.expired"));
-      else ui.notifications.error(L("login.failed", { error: message ?? kind }));
+      else ui.notifications.error(L("login.failed", { error: esc(message ?? kind) }));
       this._paintAccount();
     }
 

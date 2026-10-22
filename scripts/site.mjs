@@ -69,7 +69,8 @@ export async function startLogin() {
   const label = `Foundry ${game.version ?? ""} · ${location.host}`.replace(/\s+·/, " ·");
   const r = await call("/api/device/start", { method: "POST", body: { label }, auth: false });
   if (r.status !== 200 || !r.data?.code) throw new Error(r.data?.message || `HTTP ${r.status}`);
-  return r.data;
+  // The page to confirm the code on — a web address, or none (the code alone is shown then).
+  return { ...r.data, verifyUrl: /^https?:\/\//i.test(String(r.data.verifyUrl ?? "")) ? r.data.verifyUrl : null };
 }
 
 /** Has the code been confirmed on the site? { done, user } | { pending } | { error: denied | expired | failed }. */
@@ -93,9 +94,12 @@ export async function pollLogin(device) {
  */
 export async function mintLink(release, parts, fmt) {
   const r = await call("/api/link", { method: "POST", body: { release, parts, fmt } });
-  if (r.status === 200 && r.data?.url) return r.data;
+  if (r.status === 200 && onSite(r.data?.url)) return r.data;
   return { error: r.data?.error || `http${r.status}`, message: r.data?.message || `HTTP ${r.status}` };
 }
+
+/** A path on the site itself (/d/…, /b/…): the device's token goes nowhere else. */
+const onSite = (path) => /^\/(?!\/)/.test(String(path ?? ""));
 
 /** The site's terms of use, accepted once (the picker asks for it before the first link). */
 export async function acceptTerms() {
@@ -105,6 +109,7 @@ export async function acceptTerms() {
 
 /** A file from the site by this device's token: an archive /d/…, a backdrop /b/…, tokens /t/…. The Response. */
 export async function fetchFile(path) {
+  if (!onSite(path)) throw new Error(`HTTP 400`);
   const res = await fetch(base() + path, { headers: token() ? { authorization: `Bearer ${token()}` } : {}, cache: "no-store" });
   if (!res.ok) {
     let text = "";

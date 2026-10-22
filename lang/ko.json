@@ -139,7 +139,7 @@
   "ADMAPS_BROWSER.prefs.limits": "한도",
   "ADMAPS_BROWSER.prefs.month": "이번 달 남은 용량: {total} GB 중 {left} GB",
   "ADMAPS_BROWSER.prefs.links": "이번 시간에 남은 다운로드 링크: {n}",
-  "ADMAPS_BROWSER.prefs.active": "다운로드 중: {max}개 중 {n}개",
+  "ADMAPS_BROWSER.prefs.openAfter": "다운로드 후 장면 열기",
   "ADMAPS_BROWSER.prefs.format": "지도 형식",
   "ADMAPS_BROWSER.prefs.folders": "폴더",
   "ADMAPS_BROWSER.prefs.maps": "지도",

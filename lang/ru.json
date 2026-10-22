@@ -160,7 +160,7 @@
   "ADMAPS_BROWSER.prefs.limits": "Лимиты",
   "ADMAPS_BROWSER.prefs.month": "Осталось в этом месяце: {left} ГБ из {total} ГБ",
   "ADMAPS_BROWSER.prefs.links": "Ссылок на скачивание в этот час: {n}",
-  "ADMAPS_BROWSER.prefs.active": "Скачивается сейчас: {n} из {max}",
+  "ADMAPS_BROWSER.prefs.openAfter": "Открывать сцену после скачивания",
   "ADMAPS_BROWSER.prefs.format": "Формат карт",
   "ADMAPS_BROWSER.prefs.folders": "Папки",
   "ADMAPS_BROWSER.prefs.maps": "Карты",
