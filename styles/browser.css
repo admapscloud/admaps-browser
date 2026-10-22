@@ -1,0 +1,747 @@
+/* ADMaps Browser — the window (scripts/browser.mjs). The site's own look, ported from admaps.cloud (site/assets/app.css,
+   release.css, poll.css) and kept inside the window: every rule starts with .admaps-browser .ab-root. Core styles
+   differ between Foundry 12 (plain) and 13/14 (layers) — unlayered and this specific, these win in all three.
+   The site's screen-width breakpoints are the window's width here (container queries on its body). */
+
+.admaps-browser .window-content { padding: 0; overflow: hidden; background: #0d0f13; color: #e8eaee; }
+.admaps-browser .ab-root {
+  --bg: #0d0f13;
+  --panel: #14171d;
+  --panel-2: #191d24;
+  --line: #232831;
+  --line-2: #2e3441;
+  --ink: #e8eaee;
+  --dim: #8a93a2;
+  --dim-2: #626b7a;
+  --accent: #d9a441;
+  --rule: rgba(217, 164, 65, .28);
+  --accent-ink: #191203;
+  --patreon: #ff5900;
+  --radius: 10px;
+  position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0;
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; text-align: left;
+}
+.admaps-browser .ab-root *, .admaps-browser .ab-root *::before, .admaps-browser .ab-root *::after { box-sizing: border-box; }
+/* Core dresses headings, lists, links and pictures its own way; inside the window they start as a browser's. */
+.admaps-browser .ab-root :where(h1, h2, h3, p, ul, ol, dl, dd, figure, figcaption, nav, aside, section, main, header, form, fieldset) {
+  margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: inherit;
+  text-shadow: none; text-transform: none; letter-spacing: normal; box-shadow: none;
+}
+.admaps-browser .ab-root :where(a) { color: inherit; text-decoration: underline; text-shadow: none; }
+.admaps-browser .ab-root :where(img, video, iframe) { border: 0; max-width: none; }
+.admaps-browser .ab-root :where(b, strong) { font-weight: 700; }
+.admaps-browser .ab-root :where(code) { border: 0; }
+.admaps-browser .ab-root [hidden] { display: none; }
+
+/* ------------------------------------------------------------ the top bar: back, search, account */
+
+.admaps-browser .ab-root .ab-top {
+  flex: none; display: flex; align-items: center; gap: 18px; height: 58px; padding: 0 22px;
+  background: rgba(13, 15, 19, .88); border-bottom: 1px solid var(--line);
+}
+.admaps-browser .ab-root .ab-back {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 7px;
+  color: var(--dim); font-size: 14px; transition: color 140ms, border-color 140ms, background 140ms;
+}
+.admaps-browser .ab-root .ab-back:hover { border-color: #3d4756; background: #1b2028; color: var(--ink); }
+.admaps-browser .ab-root .ab-back[hidden] { display: none; }
+
+.admaps-browser .ab-root .search { flex: 1; max-width: 460px; position: relative; }
+.admaps-browser .ab-root .search input {
+  display: block; width: 100%; height: auto; margin: 0; padding: 8px 32px 8px 34px;
+  background: var(--panel-2); color: var(--ink);
+  border: 1px solid var(--line-2); border-radius: 7px;
+  outline: none; box-shadow: none; font: inherit; font-size: 14px; line-height: normal;
+}
+.admaps-browser .ab-root .search input::placeholder { color: var(--dim-2); }
+.admaps-browser .ab-root .search input:focus { border-color: #3d4756; background: #1b2028; box-shadow: none; outline: none; }
+.admaps-browser .ab-root .search input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+.admaps-browser .ab-root .search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--dim-2); }
+.admaps-browser .ab-root .search .clear {
+  all: unset;
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; color: var(--dim-2); padding: 4px 6px; line-height: 1; border-radius: 4px;
+}
+.admaps-browser .ab-root .search .clear:hover { color: var(--ink); }
+.admaps-browser .ab-root .search .clear[hidden] { display: none; }
+.admaps-browser .ab-root .spacer { flex: 1; }
+
+.admaps-browser .ab-root .authwrap { position: relative; flex: none; display: flex; align-items: center; gap: 9px; min-width: 0; }
+.admaps-browser .ab-root .patreon {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: none;
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 13px; border-radius: 7px; line-height: 1.55;
+  background: var(--patreon); color: #fff; font-size: 13.5px; font-weight: 600;
+  transition: filter 140ms;
+}
+.admaps-browser .ab-root .patreon:hover { filter: brightness(1.1); }
+.admaps-browser .ab-root .patreon:disabled { opacity: .55; cursor: default; filter: none; }
+.admaps-browser .ab-root .patreon.in { background: transparent; border: 1px solid var(--line-2); color: var(--dim); font-weight: 500; }
+.admaps-browser .ab-root .patreon .ab-tier { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admaps-browser .ab-root .ab-out {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: none;
+  padding: 7px 13px; border-radius: 7px; line-height: 1.55;
+  border: 1px solid var(--line-2); color: var(--dim);
+  font-size: 13px; transition: color 140ms, border-color 140ms;
+}
+.admaps-browser .ab-root .ab-out:hover { color: var(--ink); border-color: #3d4756; }
+
+/* ------------------------------------------------------------ sign-in by code (the module's own) */
+
+.admaps-browser .ab-root .ab-login {
+  flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 14px 22px;
+  background: var(--panel-2); border-bottom: 1px solid var(--line);
+}
+.admaps-browser .ab-root .ab-login[hidden] { display: none; }
+.admaps-browser .ab-root .ab-login p { margin: 0; font-size: 14px; }
+.admaps-browser .ab-root .ab-code { font: 700 26px/1.1 ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: .12em; color: var(--accent); }
+.admaps-browser .ab-root .ab-login-btns { display: flex; gap: 8px; }
+.admaps-browser .ab-root .ab-wait { flex-basis: 100%; color: var(--dim); font-size: 12px; }
+.admaps-browser .ab-root .ab-btn, .admaps-browser .ab-root .ab-retry {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 7px 14px; border-radius: 7px; border: 1px solid var(--line-2);
+  color: var(--ink); font-size: 13px; font-weight: 600; line-height: 1.3; text-decoration: none;
+}
+.admaps-browser .ab-root .ab-btn:hover, .admaps-browser .ab-root .ab-retry:hover { border-color: #3d4756; }
+.admaps-browser .ab-root .ab-btn.ab-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.admaps-browser .ab-root .ab-btn.ab-primary:hover { filter: brightness(1.08); }
+
+/* ------------------------------------------------------------ the gear: limits, format, folders */
+
+.admaps-browser .ab-root .ab-gear {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line-2); border-radius: 7px; color: var(--dim); font-size: 14px;
+  transition: color 140ms, border-color 140ms;
+}
+.admaps-browser .ab-root .ab-gear:hover, .admaps-browser .ab-root .ab-gear.on { color: var(--accent); border-color: var(--accent); }
+.admaps-browser .ab-root .ab-prefs {
+  flex: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px 30px; padding: 16px 22px 18px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.admaps-browser .ab-root .ab-prefs[hidden] { display: none; }
+.admaps-browser .ab-root .ab-pcol { min-width: 0; display: grid; align-content: start; gap: 6px; }
+.admaps-browser .ab-root .ab-pcol h3 {
+  margin: 0 0 4px; padding-bottom: 7px; border-bottom: 1px solid var(--rule);
+  font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent);
+}
+.admaps-browser .ab-root .ab-pcol p { margin: 0; font-size: 13px; color: var(--dim); }
+.admaps-browser .ab-root .ab-meter { height: 6px; border-radius: 4px; background: var(--panel-2); overflow: hidden; margin: 2px 0 4px; }
+.admaps-browser .ab-root .ab-meter i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.admaps-browser .ab-root .ab-radio { display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 3px 0; cursor: pointer; font-size: 13px; color: var(--dim); line-height: 1.45; }
+.admaps-browser .ab-root .ab-radio input { flex: none; width: 15px; height: 15px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; appearance: auto; }
+.admaps-browser .ab-root .ab-radio input::before, .admaps-browser .ab-root .ab-radio input::after { content: none; }
+.admaps-browser .ab-root .ab-radio b { color: var(--ink); font-weight: 600; }
+.admaps-browser .ab-root .ab-dir { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: var(--dim); }
+.admaps-browser .ab-root .ab-dir code { grid-column: 2 / -1; font: 13px ui-monospace, "Cascadia Mono", Consolas, monospace; color: #c3cad5; padding: 6px 0; background: none; border-radius: 0; }
+.admaps-browser .ab-root .ab-dir input {
+  min-width: 0; width: 100%; height: auto; margin: 0; padding: 6px 9px; border-radius: 7px; box-shadow: none;
+  border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink);
+  font: 13px ui-monospace, "Cascadia Mono", Consolas, monospace; line-height: normal; outline: none;
+}
+.admaps-browser .ab-root .ab-dir input:focus { border-color: #3d4756; background: #1b2028; box-shadow: none; }
+.admaps-browser .ab-root .ab-pick {
+  all: unset; box-sizing: border-box; cursor: pointer; width: 31px; height: 31px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line-2); border-radius: 7px; color: var(--dim);
+}
+.admaps-browser .ab-root .ab-pick:hover { color: var(--accent); border-color: var(--accent); }
+
+/* A download button busy (a percentage) or done (a map — «Open»; a backdrop, a token, a set — a tick). */
+.admaps-browser .ab-root .dl.is-busy { cursor: progress; opacity: 1; font-variant-numeric: tabular-nums; }
+.admaps-browser .ab-root .dl.is-busy i { font-size: 12px; }
+.admaps-browser .ab-root .dl.is-done svg { opacity: 1; }
+
+/* ------------------------------------------------------------ the body: the shelf or a page */
+
+.admaps-browser .ab-root .ab-body { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; container: ab / inline-size; }
+
+/* The tag column is narrower than the site's 236px (the owner, 22.10.2026): as wide as «My projects» need on one line. */
+.admaps-browser .ab-root main.catalog {
+  max-width: 1560px; margin: 0 auto; padding: 24px 22px 80px;
+  display: grid; grid-template-columns: 176px minmax(0, 1fr); gap: 30px; align-items: start;
+}
+.admaps-browser .ab-root main.catalog[hidden], .admaps-browser .ab-root main.release[hidden] { display: none; }
+.admaps-browser .ab-root .ab-msg { padding: 48px 20px; text-align: center; color: var(--dim); font-size: 14px; }
+.admaps-browser .ab-root .ab-msg[hidden] { display: none; }
+.admaps-browser .ab-root .ab-msg p { margin: 0 0 14px; }
+
+/* ------------------------------------------------------------ filters */
+
+/* Sticks to the window's top; too tall — sticks by its bottom to the bottom (--side-h and --view-h come from browser.mjs). */
+.admaps-browser .ab-root .side {
+  position: sticky;
+  top: min(24px, calc(var(--view-h, 100vh) - var(--side-h, 0px) - 16px));
+}
+.admaps-browser .ab-root .side h2 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--accent); margin: 0 0 10px; font-weight: 600; line-height: 1.55;
+}
+.admaps-browser .ab-root .side .head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-bottom: 7px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.admaps-browser .ab-root .side .head h2 { margin-bottom: 0; }
+.admaps-browser .ab-root .side .clearall { all: unset; cursor: pointer; font-size: 11.5px; color: var(--accent); }
+.admaps-browser .ab-root .side .clearall[hidden] { display: inline; visibility: hidden; }
+
+.admaps-browser .ab-root .facets { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.admaps-browser .ab-root .facets li { display: contents; }
+/* The line between the themes and the other tags — the column's whole width. */
+.admaps-browser .ab-root .facets li.sep { display: block; flex: 0 0 100%; height: 0; margin: 3px 0; border-top: 1px solid var(--line-2); }
+.admaps-browser .ab-root .facet {
+  all: unset; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 9px; border-radius: 20px; line-height: 1.55;
+  border: 1px solid var(--line-2); background: var(--panel);
+  font-size: 12.5px; color: #b6bdc9;
+  transition: border-color 140ms, color 140ms, background 140ms;
+}
+.admaps-browser .ab-root .facet:hover { border-color: #3d4756; color: var(--ink); }
+.admaps-browser .ab-root .facet b { font-weight: 500; color: var(--dim-2); font-size: 11px; font-variant-numeric: tabular-nums; min-width: calc(var(--nw, 2) * 1ch); }
+.admaps-browser .ab-root .facet[aria-pressed="true"] { background: rgba(217, 164, 65, .14); border-color: var(--accent); color: var(--accent); }
+.admaps-browser .ab-root .facet[aria-pressed="true"] b { color: rgba(217, 164, 65, .7); }
+.admaps-browser .ab-root .facet[disabled] { opacity: .3; cursor: default; }
+
+.admaps-browser .ab-root .showall {
+  all: unset; cursor: pointer; margin-top: 10px;
+  font-size: 12px; color: var(--dim); border-bottom: 1px dotted var(--line-2);
+}
+.admaps-browser .ab-root .showall:hover { color: var(--ink); }
+.admaps-browser .ab-root .showall[hidden] { display: none; }
+
+.admaps-browser .ab-root .side h2.projects-head {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--accent); font-weight: 600;
+  margin: 34px 0 10px; padding-bottom: 7px;
+  border-bottom: 1px solid var(--rule);
+}
+.admaps-browser .ab-root .projects { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.admaps-browser .ab-root .projects a {
+  display: flex; align-items: center; gap: 7px; white-space: nowrap;
+  padding: 6px 9px; margin: 0 -9px; border-radius: 6px;
+  text-decoration: none; color: #b6bdc9; font-size: 13px;
+  transition: background 140ms, color 140ms;
+}
+.admaps-browser .ab-root .projects a::before {
+  content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--patreon); opacity: .8;
+}
+.admaps-browser .ab-root .projects a:hover { background: var(--panel); color: var(--ink); }
+.admaps-browser .ab-root .projects a::after { content: "↗"; margin-left: auto; font-size: 11px; color: var(--dim-2); }
+.admaps-browser .ab-root .projects li[data-c="adm"] { --pc: #d9a441; }
+.admaps-browser .ab-root .projects li[data-c="fbm"] { --pc: #4b9fd5; }
+.admaps-browser .ab-root .projects li[data-c="cbm"] { --pc: #8f6fd6; }
+.admaps-browser .ab-root .projects li[data-c] a::before { background: var(--pc); opacity: 1; }
+.admaps-browser .ab-root .projects li[data-c] a:hover { color: var(--pc); }
+
+/* ------------------------------------------------------------ results bar */
+
+.admaps-browser .ab-root .bar {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px; color: var(--dim); font-size: 13px;
+}
+.admaps-browser .ab-root .bar strong { color: var(--ink); font-weight: 600; }
+.admaps-browser .ab-root .bar .countline { position: relative; min-width: 0; }
+.admaps-browser .ab-root .aibadge { all: unset; cursor: help; }
+.admaps-browser .ab-root .aibadge .aitext { border-bottom: 1px dotted currentColor; }
+.admaps-browser .ab-root .aibadge.none { color: #4cb872; }
+.admaps-browser .ab-root .aibadge.own { color: var(--accent); }
+.admaps-browser .ab-root .aibadge.ai { color: #e0584a; }
+.admaps-browser .ab-root .aibadge:focus-visible .aitext { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
+.admaps-browser .ab-root .aibadge .aitip {
+  position: absolute; left: 0; top: calc(100% + 8px); z-index: 40;
+  width: max-content; max-width: min(320px, calc(100cqw - 32px));
+  padding: 8px 11px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line-2);
+  color: var(--ink); font-size: 12.5px; font-weight: 400; line-height: 1.45; letter-spacing: 0;
+  white-space: normal; text-align: left; box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+  opacity: 0; visibility: hidden; transform: translateY(-3px);
+  transition: opacity .12s, transform .12s, visibility .12s; pointer-events: none;
+}
+.admaps-browser .ab-root .aibadge:hover .aitip, .admaps-browser .ab-root .aibadge:focus-visible .aitip,
+.admaps-browser .ab-root .aibadge.open .aitip { opacity: 1; visibility: visible; transform: none; }
+.admaps-browser .ab-root .setfilter {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  max-width: 100%; box-sizing: border-box; margin-left: 10px; vertical-align: middle;
+  padding: 2px 10px; border-radius: 999px; border: 1px solid var(--rule);
+  color: var(--ink); font-size: 12.5px; line-height: 1.5;
+}
+.admaps-browser .ab-root .setfilter[hidden] { display: none; }
+.admaps-browser .ab-root .setfilter .setlabel { color: var(--dim); }
+.admaps-browser .ab-root .setfilter .setname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admaps-browser .ab-root .setfilter i { font-style: normal; color: var(--dim); }
+.admaps-browser .ab-root .setfilter:hover { border-color: var(--accent); }
+.admaps-browser .ab-root .setfilter:hover i { color: var(--accent); }
+.admaps-browser .ab-root .setfilter:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.admaps-browser .ab-root .panes {
+  margin-left: auto; display: flex; flex: none; position: relative;
+  border: 1px solid var(--line-2); border-radius: 20px; padding: 2px; gap: 2px;
+}
+.admaps-browser .ab-root .panes .pill {
+  position: absolute; top: 2px; left: 0; height: calc(100% - 4px);
+  border-radius: 18px; background: var(--accent); z-index: 0;
+  transition: transform 260ms cubic-bezier(.4, 0, .2, 1), width 260ms cubic-bezier(.4, 0, .2, 1);
+}
+.admaps-browser .ab-root .panes .pill[hidden] { display: none; }
+.admaps-browser .ab-root .panes button {
+  all: unset; cursor: pointer; white-space: nowrap; position: relative; z-index: 1;
+  padding: 5px 13px; border-radius: 18px; line-height: 1.55;
+  color: var(--dim); font-size: 12.5px; font-weight: 500;
+  transition: color 140ms;
+}
+.admaps-browser .ab-root .panes button:hover { color: var(--ink); }
+.admaps-browser .ab-root .panes button.on { color: var(--accent-ink); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .admaps-browser .ab-root .panes .pill { transition: none; } }
+
+/* ------------------------------------------------------------ grid */
+
+.admaps-browser .ab-root .grid {
+  display: grid; gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(316px, 1fr));
+}
+.admaps-browser .ab-root .grid[hidden] { display: none; }
+
+.admaps-browser .ab-root .card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; display: flex; flex-direction: column;
+  transition: border-color 160ms;
+}
+.admaps-browser .ab-root .card:hover { border-color: var(--line-2); }
+
+.admaps-browser .ab-root .stage {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  background: var(--tint, #05070a);
+  transition: background-color 650ms ease-in-out;
+}
+.admaps-browser .ab-root .layer {
+  position: absolute; inset: 0;
+  background-image: var(--sprite);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+  opacity: 0;
+  transition: opacity 650ms ease-in-out;
+}
+.admaps-browser .ab-root .layer[data-on] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .admaps-browser .ab-root .layer { transition: none; } }
+
+.admaps-browser .ab-root .stage .shade {
+  position: absolute; inset: auto 0 0 0; height: 55%;
+  background: linear-gradient(to top, rgba(5, 7, 10, .86), rgba(5, 7, 10, .34) 42%, transparent);
+  pointer-events: none;
+}
+.admaps-browser .ab-root .dots { flex: none; display: flex; gap: 4px; }
+.admaps-browser .ab-root .dot { all: unset; cursor: pointer; padding: 5px 2px; }
+.admaps-browser .ab-root .dot i { display: block; width: 16px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .3); transition: background 200ms; }
+.admaps-browser .ab-root .dot[aria-current="true"] i { background: var(--accent); }
+.admaps-browser .ab-root .stagefoot {
+  position: absolute; left: 12px; right: 10px; bottom: 8px; z-index: 2;
+  display: flex; align-items: flex-end; gap: 10px;
+}
+.admaps-browser .ab-root .ctitle {
+  flex: 1; min-width: 0;
+  margin: 0;
+  font-size: 15px; font-weight: 600; letter-spacing: .005em; line-height: 1.25;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .55);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.admaps-browser .ab-root .body { padding: 12px 15px 15px; display: flex; flex-direction: column; flex: 1; }
+
+.admaps-browser .ab-root .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; margin: 0 0 14px; padding: 0; }
+.admaps-browser .ab-root .tags button {
+  all: unset; cursor: pointer;
+  font-size: 11px; color: #a9b1be; background: var(--panel-2); line-height: 1.55;
+  border: 1px solid var(--line); padding: 2px 8px; border-radius: 20px;
+  transition: color 140ms, border-color 140ms;
+}
+.admaps-browser .ab-root .tags button:hover { color: var(--ink); border-color: var(--line-2); }
+.admaps-browser .ab-root .tags button[data-on] { color: var(--accent); border-color: rgba(217, 164, 65, .5); }
+.admaps-browser .ab-root .tags button.cut { display: none; }
+
+.admaps-browser .ab-root .buttons { display: flex; gap: 8px; margin-top: auto; }
+
+.admaps-browser .ab-root .dl {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  white-space: nowrap;
+  padding: 9px 6px; line-height: 1.3; border-radius: 7px;
+  border: 1px solid transparent;
+  background: var(--accent); color: var(--accent-ink);
+  font-size: 13px; font-weight: 600;
+  transition: filter 140ms;
+}
+.admaps-browser .ab-root .dl:hover { filter: brightness(1.1); }
+.admaps-browser .ab-root .dl[hidden] { display: none; }
+.admaps-browser .ab-root .dl em { font-style: normal; font-weight: 400; font-size: 10.5px; opacity: .68; }
+.admaps-browser .ab-root .dl svg { flex: none; opacity: .85; }
+.admaps-browser .ab-root .dl.wide { flex: 1 1 100%; display: flex; text-decoration: none; padding-inline: 10px; }
+.admaps-browser .ab-root .dl.wide, .admaps-browser .ab-root .dl[data-locked] {
+  background: transparent; border: 1px solid var(--line-2); color: var(--dim-2);
+  text-decoration: none;
+}
+.admaps-browser .ab-root .dl.wide:hover, .admaps-browser .ab-root .dl[data-locked]:hover { filter: none; border-color: var(--accent); color: var(--accent); }
+.admaps-browser .ab-root .dl[data-free] { background: #2f8f4e; color: #f2fff6; }
+.admaps-browser .ab-root .dl:disabled { opacity: .6; cursor: progress; }
+
+.admaps-browser .ab-root a.stage { display: block; text-decoration: none; color: inherit; }
+.admaps-browser .ab-root a.stage:hover .ctitle { color: var(--accent); }
+
+.admaps-browser .ab-root .pills {
+  position: absolute; left: 9px; top: 9px; z-index: 3;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+}
+.admaps-browser .ab-root .pills .freetag { position: static; }
+.admaps-browser .ab-root .ctitle .proj { font-size: 12.5px; font-weight: 600; color: var(--c); white-space: nowrap; }
+.admaps-browser .ab-root .ctitle .proj i { font-style: normal; color: rgba(255, 255, 255, .38); margin: 0 .4em; }
+.admaps-browser .ab-root .freetag {
+  position: absolute; left: 9px; top: 9px; z-index: 3;
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 9px; border-radius: 20px; line-height: 1.55;
+  background: #2f8f4e; color: #f2fff6;
+  font-size: 10.5px; letter-spacing: .05em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+}
+.admaps-browser .ab-root .freetag b { font-weight: 700; }
+.admaps-browser .ab-root .freetag span { opacity: .82; font-variant-numeric: tabular-nums; }
+.admaps-browser .ab-root .freetag.soon { background: #3b4657; color: #cfd8e4; }
+.admaps-browser .ab-root .newtag {
+  position: absolute; right: 9px; top: 9px; z-index: 3;
+  padding: 4px 9px; border-radius: 20px; line-height: 1.55;
+  background: var(--accent); color: #1d1405;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+}
+
+/* A teaser: the picture is the card. */
+.admaps-browser .ab-root .card.teaser { display: flex; flex-direction: column; align-self: stretch; }
+.admaps-browser .ab-root .card.teaser .stage { aspect-ratio: auto; flex: 1; min-height: 240px; }
+.admaps-browser .ab-root .card.teaser .layer { transition: opacity 650ms ease-in-out, transform 700ms ease; }
+.admaps-browser .ab-root .card.teaser:hover .layer { transform: scale(1.05); }
+.admaps-browser .ab-root .card.teaser .dots { display: none; }
+
+/* NPC tokens: square portraits, smaller cards. */
+.admaps-browser .ab-root .grid.tkgrid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.admaps-browser .ab-root .tkcard .stage { aspect-ratio: 1; background: radial-gradient(circle at 50% 45%, #1f2530, #0b0d11 72%); }
+.admaps-browser .ab-root .tkthumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.admaps-browser .ab-root .tkcard .body { padding: 10px 12px 12px; }
+.admaps-browser .ab-root .tkcard .tags { margin-bottom: 0; }
+
+/* ------------------------------------------------------------ empty, load more */
+
+.admaps-browser .ab-root .empty { padding: 48px 20px 20px; text-align: center; color: var(--dim); }
+.admaps-browser .ab-root .empty[hidden] { display: none; }
+.admaps-browser .ab-root .empty p { margin: 0 0 14px; }
+.admaps-browser .ab-root .empty > button, .admaps-browser .ab-root .empty .linkish {
+  all: unset; cursor: pointer; color: var(--accent); border-bottom: 1px solid rgba(217, 164, 65, .4);
+}
+.admaps-browser .ab-root .empty .hint { font-size: 13.5px; color: var(--dim-2); }
+.admaps-browser .ab-root .empty .hint[hidden] { display: none; }
+.admaps-browser .ab-root .empty .rescue { margin-top: 42px; text-align: left; }
+.admaps-browser .ab-root .empty .rescue[hidden] { display: none; }
+.admaps-browser .ab-root .empty .rescue h3 {
+  margin: 0 0 14px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--dim-2); font-weight: 600;
+}
+
+.admaps-browser .ab-root .more {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 30px 0 10px; color: var(--dim-2); font-size: 12.5px;
+}
+.admaps-browser .ab-root .more[hidden] { display: none; }
+.admaps-browser .ab-root .more button {
+  all: unset; cursor: pointer;
+  padding: 7px 18px; border-radius: 7px;
+  border: 1px solid var(--line-2); color: var(--dim); font-size: 13px;
+  transition: color 140ms, border-color 140ms;
+}
+.admaps-browser .ab-root .more button:hover { color: var(--ink); border-color: #3d4756; }
+
+/* ------------------------------------------------------------ a page: the map's or the backdrop's */
+
+.admaps-browser .ab-root .release { max-width: 1120px; margin: 0 auto; padding: 20px 22px 90px; }
+.admaps-browser .ab-root .crumbs { font-size: 12.5px; color: var(--dim-2); margin-bottom: 16px; }
+.admaps-browser .ab-root .crumbs a { color: var(--dim); text-decoration: none; }
+.admaps-browser .ab-root .crumbs a:hover { color: var(--ink); }
+.admaps-browser .ab-root .crumbs span { margin: 0 7px; }
+.admaps-browser .ab-root .crumbs b { color: var(--dim); font-weight: 500; }
+
+.admaps-browser .ab-root .hero { margin-bottom: 0; min-width: 0; }
+.admaps-browser .ab-root .hero .stage {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--tint, #05070a);
+  transition: background-color 650ms ease-in-out;
+}
+.admaps-browser .ab-root .hero .dots { position: absolute; right: 14px; bottom: 13px; display: flex; gap: 5px; z-index: 2; }
+.admaps-browser .ab-root .hero .dot { all: unset; cursor: pointer; padding: 6px 3px; }
+.admaps-browser .ab-root .hero .dot i { display: block; width: 26px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .32); transition: background 200ms; }
+.admaps-browser .ab-root .hero .dot[aria-current="true"] i { background: var(--accent); }
+.admaps-browser .ab-root .hero .vlabel {
+  position: absolute; left: 16px; bottom: 14px; z-index: 2;
+  font-size: 12px; letter-spacing: .04em; color: rgba(255, 255, 255, .82);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .8);
+}
+.admaps-browser .ab-root .hero .play {
+  all: unset; cursor: pointer;
+  position: absolute; inset: 0; z-index: 3;
+  display: grid; place-items: center;
+  transition: background 200ms;
+}
+.admaps-browser .ab-root .hero .play:hover { background: rgba(0, 0, 0, .18); }
+.admaps-browser .ab-root .hero .play svg { width: 74px; height: 52px; filter: drop-shadow(0 2px 10px rgba(0, 0, 0, .5)); }
+.admaps-browser .ab-root .hero .play .pbg { fill: #1e2229; opacity: .82; transition: fill 160ms, opacity 160ms; }
+.admaps-browser .ab-root .hero .play .parrow { fill: #fff; }
+.admaps-browser .ab-root .hero .play:hover .pbg { fill: #cc0000; opacity: 1; }
+.admaps-browser .ab-root .hero .play:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+.admaps-browser .ab-root .hero iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 4; }
+.admaps-browser .ab-root .hero.playing .dots,
+.admaps-browser .ab-root .hero.playing .vlabel,
+.admaps-browser .ab-root .hero.playing .pills { display: none; }
+.admaps-browser .ab-root .hero .pills { left: 14px; top: 13px; z-index: 5; pointer-events: none; }
+.admaps-browser .ab-root .hero .freetag { padding: 6px 12px; font-size: 12.5px; }
+
+.admaps-browser .ab-root .toprow {
+  display: grid; grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 32px; align-items: start; margin-bottom: 38px;
+}
+
+.admaps-browser .ab-root .about { margin: 16px 0 0; }
+.admaps-browser .ab-root .facts + .about { margin: 0 0 18px; }
+.admaps-browser .ab-root .about p, .admaps-browser .ab-root .about ul, .admaps-browser .ab-root .about ol { margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: var(--dim); }
+.admaps-browser .ab-root .about h2, .admaps-browser .ab-root .about h3 { margin: 14px 0 6px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.admaps-browser .ab-root .about h2:first-child, .admaps-browser .ab-root .about h3:first-child { margin-top: 0; }
+.admaps-browser .ab-root .about ul { padding-left: 20px; list-style: disc; }
+.admaps-browser .ab-root .about ol { padding-left: 20px; list-style: decimal; }
+.admaps-browser .ab-root .about li { margin-bottom: 3px; }
+.admaps-browser .ab-root .about a { color: var(--accent); }
+.admaps-browser .ab-root .about em, .admaps-browser .ab-root .about i { font-style: italic; }
+.admaps-browser .ab-root .about :last-child { margin-bottom: 0; }
+
+.admaps-browser .ab-root .settings { margin: 14px 0 0; }
+.admaps-browser .ab-root aside .settings { margin: 0 0 18px; }
+.admaps-browser .ab-root .settings p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--dim); }
+.admaps-browser .ab-root .settings b { color: var(--ink); font-weight: 600; }
+.admaps-browser .ab-root .settings a { color: var(--accent); text-decoration: none; }
+.admaps-browser .ab-root .settings a:hover { text-decoration: underline; }
+.admaps-browser .ab-root .settings .disclaimer { margin-top: 4px; font-size: 12px; line-height: 1.5; color: var(--dim-2); }
+
+.admaps-browser .ab-root .wide { max-width: 100%; }
+.admaps-browser .ab-root .release h1 { font-size: 25px; font-weight: 650; margin: -4px 0 10px; letter-spacing: -.01em; line-height: 1.18; color: var(--ink); }
+.admaps-browser .ab-root .release h2 { font-size: 15px; font-weight: 600; margin: 0 0 12px; color: var(--ink); }
+.admaps-browser .ab-root .release .wide h2 + * { margin-bottom: 30px; }
+
+.admaps-browser .ab-root .release .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; padding: 0; }
+.admaps-browser .ab-root .release .tags a {
+  display: inline-block; text-decoration: none;
+  font-size: 12px; color: #a9b1be; background: var(--panel-2);
+  border: 1px solid var(--line); padding: 3px 10px; border-radius: 20px;
+  transition: color 140ms, border-color 140ms;
+}
+.admaps-browser .ab-root .release .tags a:hover { color: var(--accent); border-color: rgba(217, 164, 65, .5); }
+
+.admaps-browser .ab-root .versions {
+  list-style: none; margin: 12px 0 0; padding: 0;
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.admaps-browser .ab-root .versions li {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: #05070a;
+}
+.admaps-browser .ab-root .versions .shot { display: block; aspect-ratio: 16 / 9; overflow: hidden; background-color: #05070a; }
+.admaps-browser .ab-root .versions .shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.admaps-browser .ab-root .versions .pick { all: unset; display: block; width: 100%; cursor: pointer; }
+.admaps-browser .ab-root .versions li:has(.pick) { transition: border-color 160ms; }
+.admaps-browser .ab-root .versions li:has(.pick):hover { border-color: rgba(217, 164, 65, .55); }
+.admaps-browser .ab-root .versions .pick:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.admaps-browser .ab-root .versions li[aria-current="true"] { border-color: var(--accent); }
+.admaps-browser .ab-root .versions .cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 10px 7px 5px;
+  font-size: 10.5px; line-height: 1.3; letter-spacing: .02em; color: rgba(255, 255, 255, .88);
+  background: linear-gradient(to top, rgba(5, 7, 10, .85), transparent);
+}
+
+.admaps-browser .ab-root .facts { margin: 0 0 18px; display: grid; gap: 0; }
+.admaps-browser .ab-root .facts div {
+  display: flex; justify-content: space-between; gap: 14px;
+  padding: 8px 0; border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.admaps-browser .ab-root .facts div:last-child { border-bottom: none; }
+.admaps-browser .ab-root .facts dt { color: var(--dim-2); margin: 0; font-weight: 400; }
+.admaps-browser .ab-root .facts dd { margin: 0; color: var(--ink); text-align: right; }
+.admaps-browser .ab-root .facts dd a { color: var(--accent); text-decoration: none; }
+.admaps-browser .ab-root .facts dd a:hover { text-decoration: underline; }
+
+.admaps-browser .ab-root .buy { display: grid; gap: 9px; }
+.admaps-browser .ab-root .buy .dl { width: 100%; padding: 11px 4px; }
+.admaps-browser .ab-root .buy .dl[hidden] { display: none; }
+.admaps-browser .ab-root .buy .dl.wide { display: block; text-align: center; text-decoration: none; line-height: 1.35; padding: 12px 10px; }
+.admaps-browser .ab-root .buy .dl.wide[hidden] { display: none; }
+.admaps-browser .ab-root .buy .hint:not(:empty) { margin: 0 0 4px; font-size: 12px; color: var(--dim-2); line-height: 1.45; }
+.admaps-browser .ab-root .buy .hint:empty, .admaps-browser .ab-root .buy .hint[hidden] { display: none; }
+.admaps-browser .ab-root .buy .hint .freeword { color: #2f8f4e; font-weight: 700; }
+.admaps-browser .ab-root .buy .dl[data-free] { background: #2f8f4e; color: #f2fff6; }
+
+.admaps-browser .ab-root .release .systems { margin: 26px 0 0; font-size: 12.5px; color: var(--dim-2); line-height: 1.55; }
+
+.admaps-browser .ab-root .recs { margin-top: 46px; }
+.admaps-browser .ab-root .recs[hidden] { display: none; }
+.admaps-browser .ab-root .recs .grid { margin-top: 18px; }
+.admaps-browser .ab-root .recs .card .tags { margin: 0 0 14px; }
+
+.admaps-browser .ab-root .setup { color: var(--dim); font-size: 14px; line-height: 1.6; }
+.admaps-browser .ab-root .setup p { margin: 0 0 8px; }
+.admaps-browser .ab-root .setup h3 { margin: 16px 0 4px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.admaps-browser .ab-root .setup b { color: var(--ink); font-weight: 600; }
+.admaps-browser .ab-root .setup code {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: .9em; line-height: 1;
+  background: rgba(255, 255, 255, .06); border-radius: 4px; padding: 1px 5px; color: #c3cad5;
+}
+
+.admaps-browser .ab-root .vardemo { margin: 18px 0 0; }
+.admaps-browser .ab-root .vardemo figcaption { font-size: 14px; line-height: 1.6; color: var(--dim); margin: 0 0 10px; }
+.admaps-browser .ab-root .vardemo figcaption b { color: var(--ink); font-weight: 600; }
+.admaps-browser .ab-root .vardemo video {
+  display: block; width: 100%; height: auto; aspect-ratio: 16 / 9;
+  border: 1px solid var(--line); border-radius: var(--radius); background: #05070a;
+}
+
+/* ---- a poll in the description, as a guest sees it ---- */
+.admaps-browser .ab-root .poll { margin: 16px 0; padding: 14px 16px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel); }
+.admaps-browser .ab-root .poll[hidden] { display: none; }
+.admaps-browser .ab-root .poll .pollform { margin: 0; }
+.admaps-browser .ab-root .poll .pollform .pollq { margin: 0 0 3px; font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--ink); }
+.admaps-browser .ab-root .poll .pollform .pollhint { margin: 0 0 10px; font-size: 12px; line-height: 1.4; color: var(--dim-2); }
+.admaps-browser .ab-root .poll .pollform .pollopts { display: grid; gap: 6px; margin: 0 0 12px; padding: 0; border: 0; min-width: 0; }
+.admaps-browser .ab-root .poll .pollform .pollopt {
+  display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 7px 10px;
+  border: 1px solid var(--line); border-radius: 8px; cursor: default; opacity: .7;
+  font-size: 14px; line-height: 1.45; color: var(--ink);
+}
+.admaps-browser .ab-root .poll .pollform .pollopt input { flex: none; margin: 3px 0 0; accent-color: var(--accent); }
+.admaps-browser .ab-root .poll .pollform .pollopt span { min-width: 0; overflow-wrap: anywhere; }
+.admaps-browser .ab-root .poll .pollform .pollsign { margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
+.admaps-browser .ab-root .poll .pollform .pollsign a { color: var(--accent); }
+
+/* ------------------------------------------------------------ the token's window */
+
+.admaps-browser .ab-root .ab-tkover {
+  position: absolute; inset: 0; z-index: 20; container-type: size;
+  display: grid; place-items: center; overflow: auto;
+  background: rgba(5, 7, 10, .72); backdrop-filter: blur(3px);
+}
+.admaps-browser .ab-root .ab-tkover[hidden] { display: none; }
+.admaps-browser .ab-root .tkwin {
+  border: 1px solid var(--line-2); border-radius: 14px; padding: 0; outline: none;
+  width: max(280px, min(620px, calc(100cqw - 24px), calc(100cqh - 250px)));
+  max-height: calc(100cqh - 16px); overflow: auto;
+  background: var(--panel); color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .6);
+}
+.admaps-browser .ab-root .tkbox {
+  position: relative; container-type: inline-size;
+  --tk-size: 40cqw;
+  --tk-cut: .548;
+  --tk-border: max(2.5px, 1.47cqw);
+  --tk-right: 9.4cqw;
+  --tk-drop: .252;
+  --tk-d: calc(var(--tk-size) * var(--tk-cut) + 2 * var(--tk-border));
+}
+.admaps-browser .ab-root .tkclose {
+  all: unset; box-sizing: border-box; cursor: pointer; position: absolute; top: 10px; right: 10px; z-index: 3;
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(5, 7, 10, .6); color: #fff; font-size: 22px; line-height: 1;
+}
+.admaps-browser .ab-root .tkclose:hover { background: rgba(5, 7, 10, .85); }
+.admaps-browser .ab-root .tkclose:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.admaps-browser .ab-root .tkart { position: relative; aspect-ratio: 1; background: radial-gradient(circle at 50% 45%, #1f2530, #0b0d11 72%); }
+.admaps-browser .ab-root .tkfull { display: block; width: 100%; height: 100%; object-fit: contain; }
+.admaps-browser .ab-root .tkfade {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 55%; pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, .9), rgba(0, 0, 0, .55) 45%, transparent);
+}
+.admaps-browser .ab-root .tkring {
+  position: absolute; z-index: 2; width: var(--tk-size); height: var(--tk-size); pointer-events: none;
+  right: calc(var(--tk-right) + var(--tk-d) / 2 - var(--tk-size) / 2);
+  bottom: calc(var(--tk-d) * (.5 - var(--tk-drop)) - var(--tk-size) / 2);
+}
+.admaps-browser .ab-root .tkring::before {
+  content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  box-sizing: content-box; width: calc(var(--tk-size) * var(--tk-cut)); height: calc(var(--tk-size) * var(--tk-cut));
+  border-radius: 50%; border: var(--tk-border) solid var(--ring, #00ffd5); background: rgba(0, 0, 0, .55);
+  box-shadow: 0 0 10px rgba(0, 0, 0, .7), 0 0 6px color-mix(in srgb, var(--ring, #00ffd5) 45%, transparent);
+}
+.admaps-browser .ab-root .tkbadge {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .7));
+}
+.admaps-browser .ab-root .tkfull, .admaps-browser .ab-root .tkbadge { transition: opacity 220ms ease; }
+.admaps-browser .ab-root .tkfull.wait, .admaps-browser .ab-root .tkbadge.wait { opacity: 0; transition: none; }
+.admaps-browser .ab-root .tkart.wait::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, .07) 50%, transparent 65%);
+  background-size: 250% 100%; animation: ab-tkshimmer 1.2s linear infinite;
+}
+@keyframes ab-tkshimmer { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+.admaps-browser .ab-root .tkring.wait::before {
+  border-color: rgba(255, 255, 255, .14); border-top-color: var(--ring, #00ffd5);
+  animation: ab-tkspin .8s linear infinite;
+}
+@keyframes ab-tkspin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .admaps-browser .ab-root .tkart.wait::after, .admaps-browser .ab-root .tkring.wait::before { animation: none; } }
+.admaps-browser .ab-root .tkinfo { padding: 14px 18px 18px; }
+.admaps-browser .ab-root .tkname {
+  margin: 0; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink);
+  padding-right: calc(var(--tk-right) + var(--tk-d) - 10px);
+}
+.admaps-browser .ab-root .tkset { margin: 4px 0 10px; font-size: 12.5px; color: var(--dim); padding-right: calc(var(--tk-right) + var(--tk-d) - 10px); }
+.admaps-browser .ab-root .tkinfo .tags { margin-bottom: 14px; }
+.admaps-browser .ab-root .tkbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+.admaps-browser .ab-root .tkbtns .dl { flex: 1 1 0; padding-inline: 10px; }
+.admaps-browser .ab-root .tkbtns .dl.wide { flex: 1 1 100%; }
+.admaps-browser .ab-root .tkbtns .tkshare { background: transparent; border-color: var(--line-2); color: var(--ink); }
+.admaps-browser .ab-root .tkbtns .tkshare:hover { filter: none; border-color: var(--accent); color: var(--accent); }
+
+/* ------------------------------------------------------------ narrow windows (the site's screen widths) */
+
+@container ab (max-width: 1160px) {
+  .admaps-browser .ab-root .toprow { grid-template-columns: 1fr; gap: 22px; }
+}
+@container ab (max-width: 900px) {
+  .admaps-browser .ab-root main.catalog { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .admaps-browser .ab-root .side { position: static; }
+}
+@container ab (max-width: 700px) {
+  .admaps-browser .ab-root .versions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ------------------------------------------------------------ the GM's button: the site's icon (scripts/main.mjs) */
+
+/* In the Scenes sidebar, between «Create Scene» and «Create Folder»: as wide as ADMaps Tools' folder import was there
+   (core's own rule for these buttons, «.directory .directory-header .action-buttons button», would give it its padding). */
+.directory .directory-header .action-buttons button.admaps-browser-open,
+.admaps-browser-open {
+  flex: 0 0 auto; min-width: 2.4em; padding: 0 .45em;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.admaps-browser-open img { display: block; width: 1.45em; height: 1.45em; border: 0; }
+/* In the left toolbar the icon is the tool's class: drawn where Font Awesome would draw its glyph (13+: on the button,
+   12: on its <i>). 24 px in core's 32 px button, not squeezed by its padding — smaller, the «AD» does not read. */
+.admaps-browser-icon::before {
+  content: ""; display: inline-block; flex: none; width: 24px; height: 24px; vertical-align: middle;
+  background: url("../assets/admaps.svg") center / contain no-repeat;
+}
