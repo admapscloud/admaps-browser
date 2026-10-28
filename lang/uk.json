@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "Сповіщення про оновлення",
   "ADMAPS_BROWSER.updateNotice.hint": "Коли виходить новіший реліз ADMaps Browser, ігромайстер під час завантаження бачить вікно: встановлена й нова версії та як оновитися. «Більше не показувати» ховає його до наступного релізу.",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser: доступне оновлення",
-  "ADMAPS_BROWSER.update.body": "Вийшла нова версія ADMaps Browser: {latest}. У вас встановлено {current}.",
+  "ADMAPS_BROWSER.update.body": "Доступна нова версія ADMaps Browser: {latest} (поточна: {current}).",
   "ADMAPS_BROWSER.update.how": "Щоб оновити, натисніть «Повернутися до налаштувань», відкрийте «Додаткові модулі» й оновіть ADMaps Browser.",
   "ADMAPS_BROWSER.update.notes": "Що нового",
   "ADMAPS_BROWSER.update.skip": "Більше не показувати",

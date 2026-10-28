@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "Окно об обновлении",
   "ADMAPS_BROWSER.updateNotice.hint": "Когда выходит новая версия ADMaps Browser, ГМ при загрузке видит окно: какая версия стоит, какая вышла и как обновиться. «Не показывать больше» скрывает окно до следующей версии.",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser: вышло обновление",
-  "ADMAPS_BROWSER.update.body": "Вышла новая версия ADMaps Browser: {latest}. У вас стоит {current}.",
+  "ADMAPS_BROWSER.update.body": "Доступна новая версия ADMaps Browser: {latest} (текущая: {current}).",
   "ADMAPS_BROWSER.update.how": "Чтобы обновиться, выйдите в меню Setup, откройте модули и обновите ADMaps Browser.",
   "ADMAPS_BROWSER.update.notes": "Что нового",
   "ADMAPS_BROWSER.update.skip": "Не показывать больше",

@@ -19,7 +19,7 @@ const mb = (b) => `${(b / 1e6).toFixed(1)} MB`;
 
 // The maps are system-agnostic; the systems people search by, said out loud.
 const SYSTEMS = "D&D 5e (2014 & 2024), Pathfinder 2e, Daggerheart, Draw Steel, Shadowdark, Savage Worlds, "
-  + "Tales of the Valiant, Dragonbane, Old-School Essentials";
+  + "Tales of the Valiant, Dragonbane, Old-School Essentials, Cairn";
 
 const CREATORS = {
   adm: { name: "Animated Dungeon Maps", url: "https://www.patreon.com/animatedmaps" },

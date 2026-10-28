@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "Avis de mise à jour",
   "ADMAPS_BROWSER.updateNotice.hint": "Quand une nouvelle version d’ADMaps Browser sort, le MJ voit une fenêtre au chargement : la version installée, la nouvelle et comment mettre à jour. « Ne plus afficher » la masque jusqu’à la version suivante.",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser : mise à jour disponible",
-  "ADMAPS_BROWSER.update.body": "Une nouvelle version d’ADMaps Browser est sortie : {latest}. Version installée : {current}.",
+  "ADMAPS_BROWSER.update.body": "Une nouvelle version d’ADMaps Browser est disponible : {latest} (actuelle : {current}).",
   "ADMAPS_BROWSER.update.how": "Pour mettre à jour, revenez à l’accueil de Foundry, ouvrez « Modules » et mettez à jour ADMaps Browser.",
   "ADMAPS_BROWSER.update.notes": "Nouveautés",
   "ADMAPS_BROWSER.update.skip": "Ne plus afficher",

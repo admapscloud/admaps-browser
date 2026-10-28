@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "Avviso di aggiornamento",
   "ADMAPS_BROWSER.updateNotice.hint": "Quando esce una nuova versione di ADMaps Browser, al caricamento il GM vede una finestra: la versione installata, quella nuova e come aggiornare. «Non mostrare più» la nasconde fino alla versione successiva.",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser: aggiornamento disponibile",
-  "ADMAPS_BROWSER.update.body": "È uscita una nuova versione di ADMaps Browser: {latest}. La tua versione è la {current}.",
+  "ADMAPS_BROWSER.update.body": "È disponibile una nuova versione di ADMaps Browser: {latest} (attuale: {current}).",
   "ADMAPS_BROWSER.update.how": "Per aggiornare, torna alla Configurazione, apri «Moduli Aggiuntivi» e aggiorna ADMaps Browser.",
   "ADMAPS_BROWSER.update.notes": "Novità",
   "ADMAPS_BROWSER.update.skip": "Non mostrare più",

@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "Aviso de atualização",
   "ADMAPS_BROWSER.updateNotice.hint": "Quando sai uma versão mais nova do ADMaps Browser, o Mestre vê uma janela ao carregar: a versão instalada, a nova e como atualizar. “Não mostrar novamente” oculta a janela até a próxima versão.",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser: atualização disponível",
-  "ADMAPS_BROWSER.update.body": "Saiu uma nova versão do ADMaps Browser: {latest}. Você está com a {current}.",
+  "ADMAPS_BROWSER.update.body": "Uma nova versão do ADMaps Browser está disponível: {latest} (atual: {current}).",
   "ADMAPS_BROWSER.update.how": "Para atualizar, volte à Configuração, abra Módulos Adicionais e atualize o ADMaps Browser.",
   "ADMAPS_BROWSER.update.notes": "Novidades",
   "ADMAPS_BROWSER.update.skip": "Não mostrar novamente",

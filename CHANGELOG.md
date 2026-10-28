@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+- Update notice: the window now reads «A new version of ADMaps Browser is available: X (current: Y).» in every
+  language.
+- Map pages: Cairn in the list of systems the maps suit, as on the site.
+
 ## 0.1.2
 - Open the scene after download (the gear, under the limits; on by default): off, a download ends on the shelf and
   the button reads **Open**.

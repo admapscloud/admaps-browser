@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "Update-Hinweis",
   "ADMAPS_BROWSER.updateNotice.hint": "Wenn eine neuere Version von ADMaps Browser erschienen ist, sieht die SL beim Laden ein Fenster: installierte und neue Version sowie eine Anleitung zum Aktualisieren. „Nicht mehr anzeigen“ blendet es bis zur nächsten Version aus.",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser: Update verfügbar",
-  "ADMAPS_BROWSER.update.body": "Eine neue Version von ADMaps Browser ist erschienen: {latest}. Bei dir ist {current} installiert.",
+  "ADMAPS_BROWSER.update.body": "Eine neue Version von ADMaps Browser ist verfügbar: {latest} (aktuell: {current}).",
   "ADMAPS_BROWSER.update.how": "Zum Aktualisieren kehre zum Setup zurück, öffne „Add-on-Module“ und aktualisiere ADMaps Browser.",
   "ADMAPS_BROWSER.update.notes": "Neuerungen",
   "ADMAPS_BROWSER.update.skip": "Nicht mehr anzeigen",

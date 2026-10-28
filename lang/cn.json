@@ -11,7 +11,7 @@
   "ADMAPS_BROWSER.updateNotice.name": "更新提示",
   "ADMAPS_BROWSER.updateNotice.hint": "ADMaps Browser 发布新版本后，GM 在加载时会看到一个窗口：显示已安装的版本、新版本以及更新方法。“不再显示”会将其隐藏，直到下一个版本发布。",
   "ADMAPS_BROWSER.update.title": "ADMaps Browser：有可用更新",
-  "ADMAPS_BROWSER.update.body": "ADMaps Browser 已发布新版本：{latest}。你当前的版本为 {current}。",
+  "ADMAPS_BROWSER.update.body": "ADMaps Browser 有新版本可用：{latest}（当前：{current}）。",
   "ADMAPS_BROWSER.update.how": "如需更新，请“返回设置”，打开“插件模组”，然后更新 ADMaps Browser。",
   "ADMAPS_BROWSER.update.notes": "更新说明",
   "ADMAPS_BROWSER.update.skip": "不再显示",
