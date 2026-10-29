@@ -88,12 +88,27 @@ export async function pollLogin(device) {
 }
 
 /**
+ * What the site's download statistics learn with each download (the README says so): Foundry's version and this
+ * module's — nothing else, no world, no address. As the body's `client` of /api/link, and as the query
+ * (?foundry=…&module=…) of a file download; a site that does not record them passes them by.
+ */
+export function clientInfo() {
+  return { foundry: String(game.version ?? ""), module: String(game.modules.get(MODULE_ID)?.version ?? "") };
+}
+
+/** A site path with clientInfo() in its query. */
+function withClient(path) {
+  const { foundry, module } = clientInfo();
+  return `${path}${path.includes("?") ? "&" : "?"}${new URLSearchParams({ foundry, module })}`;
+}
+
+/**
  * A one-time link to a release's archive (the site's own /api/link, the picker's request): parts — the sets
  * (fv — the Foundry video with its scenes and props, fi — the stills, which then carry the scenes too), fmt — webm or
  * lite. { url, bytes, lite } | { error, message } (terms, tier, quota, rate, …).
  */
 export async function mintLink(release, parts, fmt) {
-  const r = await call("/api/link", { method: "POST", body: { release, parts, fmt } });
+  const r = await call("/api/link", { method: "POST", body: { release, parts, fmt, client: clientInfo() } });
   if (r.status === 200 && onSite(r.data?.url)) return r.data;
   return { error: r.data?.error || `http${r.status}`, message: r.data?.message || `HTTP ${r.status}` };
 }
@@ -110,7 +125,9 @@ export async function acceptTerms() {
 /** A file from the site by this device's token: an archive /d/…, a backdrop /b/…, tokens /t/…. The Response. */
 export async function fetchFile(path) {
   if (!onSite(path)) throw new Error(`HTTP 400`);
-  const res = await fetch(base() + path, { headers: token() ? { authorization: `Bearer ${token()}` } : {}, cache: "no-store" });
+  const res = await fetch(base() + withClient(path), {
+    headers: token() ? { authorization: `Bearer ${token()}` } : {}, cache: "no-store",
+  });
   if (!res.ok) {
     let text = "";
     try { text = (await res.text()).slice(0, 200); } catch (_e) { /* no body */ }

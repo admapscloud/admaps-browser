@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+- Download statistics: with each download (a map, a backdrop, tokens) the module tells admaps.cloud Foundry's version
+  and its own — nothing else. The README says what the site learns.
+
 ## 0.1.3
 - Update notice: the window now reads «A new version of ADMaps Browser is available: X (current: Y).» in every
   language.

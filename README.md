@@ -48,6 +48,10 @@ It also opens from the module settings (**ADMaps Browser → Open**).
 Sign in with your ADMaps account: the module shows a short code, you confirm it on admaps.cloud. No password is ever
 typed into Foundry.
 
+What the site learns: signing in, the module names this Foundry — its version and address — and the confirmation page
+shows it, so you can tell the code is yours. With each download it tells the site Foundry's version and its own, for
+the site's download statistics. Nothing else about your world goes to the site.
+
 - **Maps** land in Data exactly as the site's archive lays them out — `_ADMaps/<Theme>/<Name>/`. The scene is imported
   into the **ADMaps** scene folder with all its variations and opens right away.
 - A downloaded map's button turns into **Open**: it takes you to the map's scene, and makes it again in **ADMaps** if
